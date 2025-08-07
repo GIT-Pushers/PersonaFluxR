@@ -1,38 +1,14 @@
 "use client";
 
-import React, { useState, useRef } from "react";
-import { useForm, UseFormReturn } from "react-hook-form";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation"; // Import the router
-import {
-  Check,
-  ChevronsUpDown,
-  X,
-  User,
-  BookOpen,
-  Sparkles,
-  Loader2,
-} from "lucide-react";
-import Image from "next/image";
+import { Check, ChevronsUpDown, User, BookOpen } from "lucide-react";
 
 // Shadcn/UI Component Imports
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+import { Form } from "@/components/ui/form";
+
 import {
   Popover,
   PopoverContent,
@@ -48,24 +24,14 @@ import {
 } from "@/components/ui/command";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+
 import { createClient } from "@/utils/supabase/client";
 import { createCharacter } from "@/service/service";
+import { StepTwoForm } from "./_Components/FormTwo";
+import { StepOneForm } from "./_Components/Formone";
 
 // --- DATA & TYPES ---
 
-const TRAIT_OPTIONS = [
-  { value: "brave", label: "Brave" },
-  { value: "witty", label: "Witty" },
-  { value: "cautious", label: "Cautious" },
-  { value: "charismatic", label: "Charismatic" },
-  { value: "stoic", label: "Stoic" },
-  { value: "impulsive", label: "Impulsive" },
-];
-const GENDER_OPTIONS = ["Female", "Male", "Non-binary", "Other", "Unspecified"];
-const VOICE_OPTIONS = ["Alloy", "Echo", "Fable", "Onyx", "Nova", "Shimmer"];
-const LANGUAGE_OPTIONS = ["English", "Spanish", "French", "German", "Japanese"];
-const SCENE_OPTIONS = ["5", "10", "15", "20", "25"];
 const STEPS = [
   { id: 1, name: "Basic Details", icon: <User className="h-4 w-4" /> },
   { id: 2, name: "Story & Context", icon: <BookOpen className="h-4 w-4" /> },
@@ -90,7 +56,7 @@ interface CharacterFormData {
 // --- REUSABLE & SUB-COMPONENTS ---
 
 // MultiSelect and FormSidebar components remain unchanged...
-const MultiSelect = React.forwardRef<
+export const MultiSelect = React.forwardRef<
   HTMLButtonElement,
   {
     options: { value: string; label: string }[];
@@ -213,460 +179,6 @@ const FormSidebar = ({ currentStep }: { currentStep: number }) => (
 );
 
 // StepOneForm component remains unchanged...
-const StepOneForm = ({
-  form,
-  nextStep,
-}: {
-  form: UseFormReturn<CharacterFormData>;
-  nextStep: () => void;
-}) => (
-  <div className="space-y-6 animate-in fade-in-50 duration-500">
-    <div className="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2">
-      <FormField
-        control={form.control}
-        name="character_name"
-        rules={{ required: "Character name is required." }}
-        render={({ field }) => (
-          <FormItem className="md:col-span-2">
-            <FormLabel>Character Name</FormLabel>
-            <FormControl>
-              <Input placeholder="e.g., Captain Eva Rostova" {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={form.control}
-        name="traits"
-        rules={{
-          validate: (v) => v.length > 0 || "Please select at least one trait.",
-        }}
-        render={({ field }) => (
-          <FormItem className="md:col-span-2">
-            <FormLabel>Traits</FormLabel>
-            <FormControl>
-              <MultiSelect options={TRAIT_OPTIONS} {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={form.control}
-        name="gender"
-        rules={{ required: "Gender is required." }}
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Gender</FormLabel>
-            <Select onValueChange={field.onChange} value={field.value ?? ""}>
-              <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a gender" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                {GENDER_OPTIONS.map((o) => (
-                  <SelectItem key={o} value={o}>
-                    {o}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={form.control}
-        name="age"
-        rules={{ min: { value: 1, message: "Age must be positive." } }}
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Age</FormLabel>
-            <FormControl>
-              <Input
-                type="number"
-                placeholder="35"
-                {...field}
-                value={field.value ?? ""}
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={form.control}
-        name="voice_name"
-        rules={{ required: "A voice is required." }}
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Voice Name</FormLabel>
-            <Select onValueChange={field.onChange} value={field.value ?? ""}>
-              <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a voice" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                {VOICE_OPTIONS.map((o) => (
-                  <SelectItem key={o} value={o}>
-                    {o}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={form.control}
-        name="no_of_scenes"
-        rules={{ required: "Number of scenes is required." }}
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Number of Scenes</FormLabel>
-            <Select onValueChange={field.onChange} value={field.value ?? ""}>
-              <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a number" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                {SCENE_OPTIONS.map((o) => (
-                  <SelectItem key={o} value={o}>
-                    {o}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={form.control}
-        name="language"
-        rules={{ required: "Language is required." }}
-        render={({ field }) => (
-          <FormItem className="md:col-span-2">
-            <FormLabel>Language</FormLabel>
-            <Select onValueChange={field.onChange} value={field.value ?? ""}>
-              <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a language" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                {LANGUAGE_OPTIONS.map((o) => (
-                  <SelectItem key={o} value={o}>
-                    {o}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-    </div>
-    <div className="flex justify-end pt-4">
-      <Button type="button" size="lg" onClick={nextStep}>
-        Next: Story & Context
-      </Button>
-    </div>
-  </div>
-);
-
-// StepTwoForm now accepts an 'isSubmitting' prop
-const StepTwoForm = ({
-  form,
-  prevStep,
-  imagePreview,
-  setImagePreview,
-  onGenerate,
-  isGenerating,
-  isSubmitting, // New prop for submission loading state
-}: {
-  form: UseFormReturn<CharacterFormData>;
-  prevStep: () => void;
-  imagePreview: string | null;
-  setImagePreview: React.Dispatch<React.SetStateAction<string | null>>;
-  onGenerate: () => void;
-  isGenerating: boolean;
-  isSubmitting: boolean; // New prop type
-}) => {
-  const avatarFileRef = useRef<HTMLInputElement>(null);
-  const avatarRegister = form.register("avatar");
-
-  return (
-    <div className="space-y-6 animate-in fade-in-50 duration-500">
-      <Alert>
-        <Sparkles className="h-4 w-4" />
-        <AlertTitle>Feeling Uninspired?</AlertTitle>
-        <AlertDescription className="flex items-center justify-between gap-4">
-          Let AI build a creative foundation for your character.
-          <Button
-            type="button"
-            size="sm"
-            onClick={onGenerate}
-            disabled={isGenerating || isSubmitting}
-          >
-            {isGenerating ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...
-              </>
-            ) : (
-              "Generate with AI"
-            )}
-          </Button>
-        </AlertDescription>
-      </Alert>
-
-      <fieldset disabled={isGenerating || isSubmitting} className="space-y-6">
-        <FormItem>
-          <FormLabel>Character Image (Avatar)</FormLabel>
-          <FormControl>
-            <Input
-              type="file"
-              accept="image/*"
-              className="file:text-foreground"
-              {...avatarRegister}
-              ref={(e) => {
-                avatarRegister.ref(e);
-                avatarFileRef.current = e;
-              }}
-              onChange={(e) => {
-                avatarRegister.onChange(e);
-                if (e.target.files?.[0]) {
-                  setImagePreview(URL.createObjectURL(e.target.files[0]));
-                } else {
-                  setImagePreview(null);
-                }
-              }}
-            />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-
-        {imagePreview && (
-          <div className="relative w-40 h-40 mx-auto rounded-lg overflow-hidden">
-            <Image
-              src={imagePreview}
-              alt="Avatar Preview"
-              fill
-              style={{ objectFit: "cover" }}
-            />
-            <Button
-              type="button"
-              variant="destructive"
-              size="icon"
-              className="absolute top-1 right-1 h-7 w-7 rounded-full z-10"
-              onClick={() => {
-                form.resetField("avatar");
-                if (avatarFileRef.current) {
-                  avatarFileRef.current.value = "";
-                }
-                setImagePreview(null);
-              }}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-        )}
-        <FormField
-          control={form.control}
-          name="backstory"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Backstory</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Describe the character's past..."
-                  rows={6}
-                  {...field}
-                  value={field.value ?? ""}
-                />
-              </FormControl>
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="story_context"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Story Context</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="What is the character's current situation?"
-                  rows={4}
-                  {...field}
-                  value={field.value ?? ""}
-                />
-              </FormControl>
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="starting_propt"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Starting Prompt</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="The first line of dialogue or action..."
-                  rows={3}
-                  {...field}
-                  value={field.value ?? ""}
-                />
-              </FormControl>
-            </FormItem>
-          )}
-        />
-
-        <div className="space-y-4 rounded-lg border p-4">
-          <FormLabel className="text-base">Starting Options</FormLabel>
-          <FormField
-            control={form.control}
-            name="start_options.0"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="font-normal text-muted-foreground">
-                  Option 1
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="First choice for the user..."
-                    {...field}
-                    value={field.value ?? ""}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="start_options.1"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="font-normal text-muted-foreground">
-                  Option 2
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Second choice for the user..."
-                    {...field}
-                    value={field.value ?? ""}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="start_options.2"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="font-normal text-muted-foreground">
-                  Option 3
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Third choice for the user..."
-                    {...field}
-                    value={field.value ?? ""}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <div className="space-y-4 rounded-lg border p-4">
-          <FormLabel className="text-base">Ending Scenes (Optional)</FormLabel>
-          <FormField
-            control={form.control}
-            name="ending_scenes.0"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="font-normal text-muted-foreground">
-                  Ending Scene 1
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="A potential concluding scene..."
-                    {...field}
-                    value={field.value ?? ""}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="ending_scenes.1"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="font-normal text-muted-foreground">
-                  Ending Scene 2
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="An alternative concluding scene..."
-                    {...field}
-                    value={field.value ?? ""}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="ending_scenes.2"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="font-normal text-muted-foreground">
-                  Ending Scene 3
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Another alternative concluding scene..."
-                    {...field}
-                    value={field.value ?? ""}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-        </div>
-      </fieldset>
-
-      <div className="flex justify-between items-center pt-4">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={prevStep}
-          disabled={isSubmitting}
-        >
-          Back
-        </Button>
-        <Button type="submit" size="lg" disabled={isGenerating || isSubmitting}>
-          {isSubmitting ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Creating...
-            </>
-          ) : (
-            "Create Character"
-          )}
-        </Button>
-      </div>
-    </div>
-  );
-};
 
 // --- MAIN CHARACTER FORM COMPONENT ---
 
@@ -727,11 +239,12 @@ const CharacterForm = () => {
 
     setIsGenerating(true);
     try {
-      const { character_name, traits, age, gender } = form.getValues();
+      const { character_name, traits, age, gender, language } =
+        form.getValues();
       const response = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ character_name, traits, age, gender }),
+        body: JSON.stringify({ character_name, traits, age, gender, language }),
       });
 
       if (!response.ok) throw new Error(`Error: ${response.statusText}`);

@@ -47,7 +47,12 @@ export async function POST(req: NextRequest) {
     }
 
     const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-    const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = ai.getGenerativeModel({
+      model: "gemini-1.5-flash",
+      generationConfig: {
+        maxOutputTokens: 3000,
+      },
+    });
 
     console.log("🤖 Calling Google AI with prompt...");
 

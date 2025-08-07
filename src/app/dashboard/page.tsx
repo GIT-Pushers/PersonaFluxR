@@ -287,8 +287,10 @@ const Dashboard = () => {
                     Starting Prompt
                   </h3>
                   <p className="text-sm text-muted-foreground italic border-l-4 pl-3">
-                    "{selectedCharacter.starting_propt || "No prompt provided."}
-                    "
+                    `
+                    {selectedCharacter.starting_propt ||
+                      "No starting prompt provided."}
+                    `
                   </p>
                 </div>
 

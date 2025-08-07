@@ -8,6 +8,7 @@ import { useChar } from "@/store/useChar";
 import NPCBubble from "@/components/NpcBubble";
 import { getCharacterById } from "@/service/service";
 import { useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 interface Character {
   id: number;
@@ -19,6 +20,7 @@ interface Character {
   starting_propt?: string;
   start_options: string[];
   no_of_scenes: number;
+  language?: string;
 }
 
 const Home = () => {
@@ -34,7 +36,22 @@ const Home = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const chatEndRef = useRef<HTMLDivElement | null>(null);
-
+  const router = useRouter();
+  useEffect(() => {
+    if (character?.no_of_scenes && currentScene > character.no_of_scenes) {
+      const handleGameComplete = () => {
+        if (
+          confirm(
+            "Adventure Complete! You've reached the end of this story. Would you like to return to the dashboard to start a new adventure?"
+          )
+        ) {
+          router.push("/dashboard");
+        }
+      };
+      handleGameComplete();
+      return;
+    }
+  }, [currentScene, character?.no_of_scenes]);
   const mockCharacter: Character = {
     id: 1,
     character_name: "Aria the Brave",
@@ -75,6 +92,7 @@ const Home = () => {
           "Wait",
         ],
         no_of_scenes: data.no_of_scenes || 5,
+        language: data.language || "English",
       };
     } catch (err: any) {
       setError(`Failed to load character: ${err.message || "Unknown error"}`);
@@ -118,7 +136,7 @@ const Home = () => {
           character.story_context
         }\n\nStory so far: ${storyHistory.slice(-2).join(" ")}`,
         voice_name: "Alloy",
-        language: "English",
+        language: character.language || "English",
         starting_prompt: `The user chose: \"${selectedOption}\". Continue the story and provide 3 new choices.`,
       };
 
@@ -246,18 +264,27 @@ const Home = () => {
             <h2 className="text-2xl font-bold text-gray-900">
               Interactive Story
             </h2>
-            <button
-              onClick={() => setIsDraggable(!isDraggable)}
-              className={`flex items-center gap-1 px-3 py-1 rounded-md text-sm font-medium ${
-                isDraggable
-                  ? "bg-green-100 text-green-700"
-                  : "bg-gray-100 text-gray-700"
-              }`}
-            >
-              {" "}
-              <Move className="w-4 h-4" />
-              {isDraggable ? "Draggable On" : "Draggable Off"}
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setIsDraggable(!isDraggable)}
+                className={`flex items-center gap-1 px-3 py-1 rounded-md text-sm font-medium ${
+                  isDraggable
+                    ? "bg-green-100 text-green-700"
+                    : "bg-gray-100 text-gray-700"
+                }`}
+              >
+                {" "}
+                <Move className="w-4 h-4" />
+                {isDraggable ? "Draggable On" : "Draggable Off"}
+              </button>
+              <button 
+                onClick={() => router.push("/dashboard")}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors duration-200"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Dashboard
+              </button>
+            </div>
           </div>
           {character && (
             <div className="text-center mt-2">
