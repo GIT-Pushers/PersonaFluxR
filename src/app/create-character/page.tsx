@@ -29,6 +29,7 @@ import { createClient } from "@/utils/supabase/client";
 import { createCharacter } from "@/service/service";
 import { StepTwoForm } from "./_Components/FormTwo";
 import { StepOneForm } from "./_Components/Formone";
+import { toast } from "sonner";
 
 // --- DATA & TYPES ---
 
@@ -231,7 +232,7 @@ const CharacterForm = () => {
   const handleGenerateStory = async () => {
     const isValid = await form.trigger(stepOneFields);
     if (!isValid) {
-      alert(
+      toast.error(
         "Please fill in all required basic details before generating with AI."
       );
       return;
@@ -278,7 +279,7 @@ const CharacterForm = () => {
       form.setValue("ending_scenes", endingScenes, { shouldValidate: true });
     } catch (error) {
       console.error("Failed to generate story:", error);
-      alert(
+      toast.error(
         "Sorry, something went wrong while generating the story. Please try again."
       );
     } finally {
@@ -333,11 +334,11 @@ const CharacterForm = () => {
         throw new Error(insertError.message);
       }
 
-      alert("Character created and saved successfully!");
+      toast.success("Character created and saved successfully!");
       router.push("/dashboard"); // Redirect on success
     } catch (error) {
       console.error("Submission Error:", error);
-      alert(
+      toast.error(
         `Failed to create character: ${
           error instanceof Error ? error.message : "An unknown error occurred."
         }`
