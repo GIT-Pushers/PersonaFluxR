@@ -6,9 +6,12 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { TraitsMultiSelect } from "@/components/ui/multiSelect";
 import { useChar } from "@/store/useChar";
+import NPCBubble from "@/components/NpcBubble";
 
 const Home = () => {
   const [currentImage, setCurrentImage] = useState(2);
+  const [characterIndex, setCharacterIndex] = useState(3);
+  console.log("Character Index:", characterIndex);
 
   const {
     showMore,
@@ -55,29 +58,33 @@ const Home = () => {
         >
           <ArrowRight />
         </button>
-
         <motion.div
+          className="absolute left-1/2 transform -translate-x-1/2 text-white text-center"
           drag={isDraggable}
-          dragConstraints={{ top: -100, bottom: 50, left: -100, right: 100 }}
+          dragConstraints={{ top: -100, bottom: 100, left: -150, right: 150 }}
           dragElastic={0.1}
-          className={`scale-250 w-[128px] h-[128px] bg-[url('/male/male1/idle.png')] bg-no-repeat absolute ${
-            isDraggable ? "cursor-grab" : "cursor-default"
-          }`}
-          style={{
-            animation: "idle 1s steps(6) infinite",
-            backgroundSize: "auto",
-          }}
         >
-          <style jsx>{`
-            @keyframes idle {
-              from {
-                background-position: 0px;
+          <NPCBubble message="Hello! How can I assist you today?" />
+          <div
+            className={`scale-[2.5] w-[128px] h-[128px] bg-[url('/male/male${characterIndex}/idle.png')] bg-no-repeat ${
+              isDraggable ? "cursor-grab" : "cursor-default"
+            }`}
+            style={{
+              animation: "idle 1s steps(6) infinite",
+              backgroundSize: "auto",
+            }}
+          >
+            <style jsx>{`
+              @keyframes idle {
+                from {
+                  background-position: 0px;
+                }
+                to {
+                  background-position: -768px;
+                }
               }
-              to {
-                background-position: -768px;
-              }
-            }
-          `}</style>
+            `}</style>
+          </div>
         </motion.div>
       </section>
 
@@ -220,6 +227,55 @@ const Home = () => {
                   >
                     Enable Draggable Character
                   </label>
+                </div>
+                <div className="space-y-4">
+                  <h2 className="text-lg font-semibold text-gray-800 text-center">
+                    Select Character
+                  </h2>
+                  <div className="flex justify-evenly items-center space-x-3">
+                    <div className="w-[85px] h-[85px] flex items-center justify-center ">
+                      <Image
+                        src="/male/male1/char.png"
+                        alt="Character 1"
+                        className={`cursor-pointer rounded-lg border-2 transition-all scale-110 duration-200 hover:scale-115 object-cover ${
+                          characterIndex === 1
+                            ? "border-blue-500 shadow-lg"
+                            : "border-gray-300 hover:border-gray-400"
+                        }`}
+                        width={85}
+                        height={85}
+                        onClick={() => setCharacterIndex(1)}
+                      />
+                    </div>
+                    <div className="w-[85px] h-[85px] flex items-center justify-center">
+                      <Image
+                        src="/male/male2/char.png"
+                        alt="Character 2"
+                        className={`cursor-pointer rounded-lg border-2 transition-all duration-200 hover:scale-105 object-cover ${
+                          characterIndex === 2
+                            ? "border-blue-500 shadow-lg"
+                            : "border-gray-300 hover:border-gray-400"
+                        }`}
+                        width={85}
+                        height={85}
+                        onClick={() => setCharacterIndex(2)}
+                      />
+                    </div>
+                    <div className="w-[85px] h-[85px] flex items-center justify-center">
+                      <Image
+                        src="/male/male3/char.png"
+                        alt="Character 3"
+                        className={`cursor-pointer rounded-lg border-2 transition-all duration-200 hover:scale-105 object-cover ${
+                          characterIndex === 3
+                            ? "border-blue-500 shadow-lg"
+                            : "border-gray-300 hover:border-gray-400"
+                        }`}
+                        width={85}
+                        height={85}
+                        onClick={() => setCharacterIndex(3)}
+                      />
+                    </div>
+                  </div>
                 </div>
               </motion.div>
             )}
