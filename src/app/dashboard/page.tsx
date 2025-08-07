@@ -175,9 +175,7 @@ const Dashboard = () => {
                     >
                       <Eye className="mr-2 h-4 w-4" /> Details
                     </Button>
-                    <Button
-                      onClick={() => router.push(`/start/${char.id}`)}
-                    >
+                    <Button onClick={() => router.push(`/home/${char.id}`)}>
                       <Play className="mr-2 h-4 w-4" /> Play
                     </Button>
                   </CardFooter>
@@ -327,9 +325,7 @@ const Dashboard = () => {
               <DialogFooter>
                 <Button
                   className="w-full"
-                  onClick={() =>
-                    router.push(`/start/${selectedCharacter.id}`)
-                  }
+                  onClick={() => router.push(`/home/${selectedCharacter.id}`)}
                 >
                   <Play className="mr-2 h-4 w-4" /> Play Story
                 </Button>

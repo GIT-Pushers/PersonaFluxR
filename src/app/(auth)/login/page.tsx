@@ -119,7 +119,6 @@ export default function LoginPage() {
                 <div className="p-8">
                   <div className="flex flex-col gap-3">
                     <LoginGoogle />
-
                     <LoginGithub />
                   </div>
 
