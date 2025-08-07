@@ -19,20 +19,20 @@ const DEFAULT_AVATARS = [
   {
     id: "male1",
     name: "Male Character 1",
-    path: "/male/male1/char.png",
-    publicUrl: "/male/male1/char.png",
+    path: "/male/male1/idle.png",
+    publicUrl: "/male/male1/idle.png",
   },
   {
     id: "male2",
     name: "Male Character 2",
-    path: "/male/male2/char.png",
-    publicUrl: "/male/male2/char.png",
+    path: "/male/male2/idle.png",
+    publicUrl: "/male/male2/idle.png",
   },
   {
     id: "male3",
     name: "Male Character 3",
-    path: "/male/male3/char.png",
-    publicUrl: "/male/male3/char.png",
+    path: "/male/male3/idle.png",
+    publicUrl: "/male/male3/idle.png",
   },
 ];
 interface CharacterFormData {
@@ -157,13 +157,14 @@ export const StepTwoForm = ({
                     }`}
                     onClick={() => handleDefaultAvatarSelect(avatar)}
                   >
-                    <div className="aspect-square p-2">
+                    <div className="aspect-square p-2 overflow-hidden">
                       <Image
                         src={avatar.publicUrl}
                         alt={avatar.name}
-                        width={100}
-                        height={100}
-                        className="w-full h-full object-cover rounded-md"
+                        width={128}
+                        height={128}
+                        className="w-full h-full object-cover object-left rounded-md"
+                        unoptimized
                       />
                     </div>
                     <p className="text-xs text-center text-gray-600 pb-2">

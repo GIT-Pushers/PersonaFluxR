@@ -338,7 +338,7 @@ const CharacterForm = () => {
           (scene) => scene && scene.trim() !== ""
         ),
         avatar_url: finalAvatarUrl,
-        email: session.user.email, // Updated to match service interface
+        email: session.user.email, 
       };
 
       console.log("📤 Final character data for Supabase:", characterToInsert);
