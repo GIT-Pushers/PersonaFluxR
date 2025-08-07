@@ -18,10 +18,12 @@ const LoginGithub = () => {
       onClick={handleGithubLogin}
       role="button"
       tabIndex={0}
-      className="w-full h-12 rounded-lg bg-foreground text-background flex items-center justify-center gap-3 px-4 font-medium shadow transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-ring"
+      className="w-full bg-gray-800 hover:bg-gray-900 text-white border-2 border-gray-800 rounded font-mono font-bold py-3 px-4 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-ring"
     >
-      <FaGithub className="text-lg" />
-      <span>{isPending ? "Redirecting..." : "Login with GitHub"}</span>
+      <div className="flex items-center justify-center gap-2">
+        <FaGithub className="text-lg" />
+        <span>{isPending ? "Redirecting..." : "Sign in with GitHub"}</span>
+      </div>
     </div>
   );
 };

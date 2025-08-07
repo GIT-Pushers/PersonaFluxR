@@ -38,7 +38,7 @@ Character:
 - Backstory: ${backstory}
 - Story Context: ${story_context}
 - Voice Style: ${voice_name}
-- Language: ${language}
+- Language: ${language}   
 
 Current Prompt: ${starting_prompt}
 
