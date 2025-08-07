@@ -22,67 +22,73 @@ export default function LoginPage() {
               <div className="flex items-center gap-3">
                 <Sparkles className="w-8 h-8 text-indigo-600 animate-pulse" />
                 <h1 className="text-3xl lg:text-4xl font-bold text-indigo-600">
-                  Echo Hire
+                  PersonaFlux
                 </h1>
               </div>
 
               <h2 className="text-2xl lg:text-3xl font-bold text-gray-800">
-                Master Your Interview Skills with AI
+                Build Dynamic NPCs With Personality
               </h2>
 
               <p className="text-lg text-gray-600">
-                Practice with our voice-enabled AI recruiter and get instant
-                feedback on your responses, tone, and clarity.
+                Generate lifelike NPC dialogue using AI. Create character
+                backstories, branching conversations, and immersive interactions
+                in seconds.
               </p>
 
               <div className="space-y-4">
+                {/* Real-time dialogue */}
                 <div className="flex items-start gap-3">
                   <Mic className="w-5 h-5 mt-1 text-indigo-500 flex-shrink-0" />
                   <div>
                     <h3 className="font-semibold text-gray-800">
-                      Voice-Powered Practice
+                      Real-Time NPC Interaction
                     </h3>
                     <p className="text-gray-600 text-sm">
-                      Respond naturally using your voice, just like a real
-                      interview.
+                      Chat with your characters like players would in-game. The
+                      AI responds in personality and context.
                     </p>
                   </div>
                 </div>
 
+                {/* Personality-driven */}
                 <div className="flex items-start gap-3">
                   <Bot className="w-5 h-5 mt-1 text-indigo-500 flex-shrink-0" />
                   <div>
                     <h3 className="font-semibold text-gray-800">
-                      AI-Powered Feedback
+                      Personality-Driven Dialogue
                     </h3>
                     <p className="text-gray-600 text-sm">
-                      Get instant analysis on your answers, pacing, and
-                      confidence.
+                      Dialogue stays consistent with your character’s traits,
+                      backstory, and tone.
                     </p>
                   </div>
                 </div>
 
+                {/* Branching dialogues */}
                 <div className="flex items-start gap-3">
                   <BarChart2 className="w-5 h-5 mt-1 text-indigo-500 flex-shrink-0" />
                   <div>
                     <h3 className="font-semibold text-gray-800">
-                      Performance Tracking
+                      Branching Dialogue Paths
                     </h3>
                     <p className="text-gray-600 text-sm">
-                      Monitor your progress over time with detailed analytics.
+                      Automatically generate multiple responses or conversation
+                      routes to fit different player choices.
                     </p>
                   </div>
                 </div>
               </div>
 
+              {/* Quick Setup Box */}
               <div className="bg-indigo-50 p-4 rounded-lg border border-indigo-100">
                 <div className="flex items-center gap-2 text-indigo-700">
                   <Clock className="w-4 h-4" />
-                  <span className="text-sm font-medium">Quick Setup</span>
+                  <span className="text-sm font-medium">Instant Creation</span>
                 </div>
                 <p className="text-gray-600 text-sm mt-1">
-                  Sign in with your preferred provider and start practicing in
-                  seconds. No credit card required.
+                  Sign in to create, customize, and chat with your NPCs right
+                  away. No setup, no credit card required.
                 </p>
               </div>
             </div>
@@ -95,7 +101,7 @@ export default function LoginPage() {
                     Welcome Back!
                   </h1>
                   <p className="text-sm text-gray-500 mt-2">
-                    Sign in to continue your interview preparation
+                    Sign in to start building your AI-powered NPCs
                   </p>
                 </div>
 
@@ -127,7 +133,7 @@ export default function LoginPage() {
       {/* Footer */}
       <footer className="py-4 text-center">
         <p className="text-sm text-gray-500">
-          © {new Date().getFullYear()} Echo Hire. All rights reserved.
+          © {new Date().getFullYear()} PersonaFlux. All rights reserved.
         </p>
       </footer>
     </div>
