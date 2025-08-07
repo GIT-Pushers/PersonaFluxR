@@ -4,6 +4,7 @@ import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
+import Image from "next/image";
 
 const ProfilePage = () => {
   const router = useRouter();
@@ -61,7 +62,9 @@ const ProfilePage = () => {
         {/* Profile Picture */}
         <div className="flex justify-center">
           {user?.user_metadata?.avatar_url ? (
-            <img
+            <Image
+              height={100}
+              width={100}
               src={user.user_metadata.avatar_url}
               alt="Profile"
               className="w-24 h-24 rounded-full"
