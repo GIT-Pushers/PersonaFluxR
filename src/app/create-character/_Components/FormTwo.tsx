@@ -11,8 +11,30 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, Sparkles, X } from "lucide-react";
 import Image from "next/image";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
+
+// Default avatar options
+const DEFAULT_AVATARS = [
+  {
+    id: "male1",
+    name: "Male Character 1",
+    path: "/male/male1/char.png",
+    publicUrl: "/male/male1/char.png",
+  },
+  {
+    id: "male2",
+    name: "Male Character 2",
+    path: "/male/male2/char.png",
+    publicUrl: "/male/male2/char.png",
+  },
+  {
+    id: "male3",
+    name: "Male Character 3",
+    path: "/male/male3/char.png",
+    publicUrl: "/male/male3/char.png",
+  },
+];
 interface CharacterFormData {
   character_name: string;
   traits: string[];
@@ -22,6 +44,7 @@ interface CharacterFormData {
   no_of_scenes: string;
   language: string;
   avatar?: FileList;
+  avatar_url?: string; // Add this for default avatar selection
   backstory?: string;
   story_context?: string;
   starting_propt?: string;
@@ -47,6 +70,47 @@ export const StepTwoForm = ({
 }) => {
   const avatarFileRef = useRef<HTMLInputElement>(null);
   const avatarRegister = form.register("avatar");
+
+  // State for default avatar selection
+  const [selectedDefaultAvatar, setSelectedDefaultAvatar] = useState<
+    string | null
+  >(null);
+
+  // Handle default avatar selection
+  const handleDefaultAvatarSelect = (avatar: (typeof DEFAULT_AVATARS)[0]) => {
+    setSelectedDefaultAvatar(avatar.id);
+    setImagePreview(avatar.publicUrl);
+    // Clear file input if user switches to default avatar
+    if (avatarFileRef.current) {
+      avatarFileRef.current.value = "";
+    }
+    form.resetField("avatar");
+    // Set the avatar_url in the form
+    form.setValue("avatar_url", avatar.publicUrl);
+  };
+
+  // Handle file upload
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    avatarRegister.onChange(e);
+    if (e.target.files?.[0]) {
+      setImagePreview(URL.createObjectURL(e.target.files[0]));
+      setSelectedDefaultAvatar(null);
+      form.setValue("avatar_url", ""); // Clear default avatar URL
+    } else {
+      setImagePreview(null);
+    }
+  };
+
+  // Clear all avatar selections
+  const clearAvatar = () => {
+    form.resetField("avatar");
+    form.setValue("avatar_url", "");
+    if (avatarFileRef.current) {
+      avatarFileRef.current.value = "";
+    }
+    setImagePreview(null);
+    setSelectedDefaultAvatar(null);
+  };
 
   return (
     <div className="space-y-6 animate-in fade-in-50 duration-500">
@@ -74,30 +138,89 @@ export const StepTwoForm = ({
 
       <fieldset disabled={isGenerating || isSubmitting} className="space-y-6">
         <FormItem>
-          <FormLabel>Character Image (Avatar)</FormLabel>
-          <FormControl>
-            <Input
-              type="file"
-              accept="image/*"
-              className="file:text-foreground"
-              {...avatarRegister}
-              ref={(e) => {
-                avatarRegister.ref(e);
-                avatarFileRef.current = e;
-              }}
-              onChange={(e) => {
-                avatarRegister.onChange(e);
-                if (e.target.files?.[0]) {
-                  setImagePreview(URL.createObjectURL(e.target.files[0]));
-                } else {
-                  setImagePreview(null);
-                }
-              }}
-            />
-          </FormControl>
+          <FormLabel>Character Avatar</FormLabel>
+
+          {/* Default Avatar Options */}
+          <div className="space-y-4">
+            <div>
+              <h4 className="text-sm font-medium text-gray-700 mb-3">
+                Choose a default avatar:
+              </h4>
+              <div className="grid grid-cols-3 gap-4">
+                {DEFAULT_AVATARS.map((avatar) => (
+                  <div
+                    key={avatar.id}
+                    className={`relative cursor-pointer rounded-lg border-2 transition-all duration-200 hover:border-blue-300 ${
+                      selectedDefaultAvatar === avatar.id
+                        ? "border-blue-500 ring-2 ring-blue-200"
+                        : "border-gray-200"
+                    }`}
+                    onClick={() => handleDefaultAvatarSelect(avatar)}
+                  >
+                    <div className="aspect-square p-2">
+                      <Image
+                        src={avatar.publicUrl}
+                        alt={avatar.name}
+                        width={100}
+                        height={100}
+                        className="w-full h-full object-cover rounded-md"
+                      />
+                    </div>
+                    <p className="text-xs text-center text-gray-600 pb-2">
+                      {avatar.name}
+                    </p>
+                    {selectedDefaultAvatar === avatar.id && (
+                      <div className="absolute top-1 right-1 bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center">
+                        <svg
+                          className="w-3 h-3"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* OR Separator */}
+            <div className="flex items-center">
+              <div className="flex-1 border-t border-gray-200"></div>
+              <div className="px-3 text-sm text-gray-500">OR</div>
+              <div className="flex-1 border-t border-gray-200"></div>
+            </div>
+
+            {/* Custom File Upload */}
+            <div>
+              <h4 className="text-sm font-medium text-gray-700 mb-3">
+                Upload your own image:
+              </h4>
+              <FormControl>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  className="file:text-foreground"
+                  {...avatarRegister}
+                  ref={(e) => {
+                    avatarRegister.ref(e);
+                    avatarFileRef.current = e;
+                  }}
+                  onChange={handleFileUpload}
+                />
+              </FormControl>
+            </div>
+          </div>
+
           <FormMessage />
         </FormItem>
 
+        {/* Image Preview */}
         {imagePreview && (
           <div className="relative w-40 h-40 mx-auto rounded-lg overflow-hidden">
             <Image
@@ -111,13 +234,7 @@ export const StepTwoForm = ({
               variant="destructive"
               size="icon"
               className="absolute top-1 right-1 h-7 w-7 rounded-full z-10"
-              onClick={() => {
-                form.resetField("avatar");
-                if (avatarFileRef.current) {
-                  avatarFileRef.current.value = "";
-                }
-                setImagePreview(null);
-              }}
+              onClick={clearAvatar}
             >
               <X className="h-4 w-4" />
             </Button>

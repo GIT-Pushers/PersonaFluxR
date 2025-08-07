@@ -12,7 +12,7 @@ export interface CharacterInsertData {
   avatar_url?: string | null;
   backstory?: string;
   story_context?: string;
-  starting_prompt?: string;
+  starting_propt?: string; // Keep the typo to match database schema
   start_options: string[];
   ending_scenes: string[];
   user_email?: string; // Changed from user_id to user_email
