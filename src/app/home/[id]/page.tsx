@@ -241,7 +241,9 @@ const Home = () => {
             style={{
               animation: "idle 1s steps(6) infinite",
               backgroundSize: "auto",
-              backgroundImage: `url('/male/male1/idle.png')`,
+              backgroundImage: character?.avatar_url
+                ? `url('${character.avatar_url}')`
+                : `url('/male/male1/idle.png')`,
             }}
           >
             <style jsx>{`
@@ -277,7 +279,7 @@ const Home = () => {
                 <Move className="w-4 h-4" />
                 {isDraggable ? "Draggable On" : "Draggable Off"}
               </button>
-              <button 
+              <button
                 onClick={() => router.push("/dashboard")}
                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors duration-200"
               >

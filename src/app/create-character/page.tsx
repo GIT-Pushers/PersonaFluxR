@@ -47,6 +47,7 @@ interface CharacterFormData {
   no_of_scenes: string;
   language: string;
   avatar?: FileList;
+  avatar_url?: string; // Add this for default avatar selection
   backstory?: string;
   story_context?: string;
   starting_propt?: string;
@@ -226,6 +227,7 @@ const CharacterForm = () => {
       start_options: ["", "", ""],
       ending_scenes: ["", "", ""],
       avatar: undefined,
+      avatar_url: "", // Add default value for avatar_url
     },
   });
 
@@ -299,12 +301,25 @@ const CharacterForm = () => {
         throw new Error("Could not authenticate user. Please log in again.");
       }
 
-      // Convert image to Base64 if it exists
-      let avatarBase64 = null;
+      // Handle avatar - either uploaded file or default selection
+      let finalAvatarUrl = null;
       const avatarFile = data.avatar?.[0];
+
       if (avatarFile) {
-        avatarBase64 = await toBase64(avatarFile);
+        // If user uploaded a file, convert to Base64
+        const avatarBase64 = await toBase64(avatarFile);
+        finalAvatarUrl = avatarBase64 as string;
+      } else if (data.avatar_url) {
+        // If user selected a default avatar, use that URL
+        finalAvatarUrl = data.avatar_url;
       }
+
+      console.log("📤 Submitting character data:", {
+        ...data,
+        finalAvatarUrl,
+        hasUploadedFile: !!avatarFile,
+        hasDefaultAvatar: !!data.avatar_url,
+      });
 
       const characterToInsert = {
         character_name: data.character_name,
@@ -316,26 +331,27 @@ const CharacterForm = () => {
         language: data.language,
         backstory: data.backstory,
         story_context: data.story_context,
-        starting_propt: data.starting_propt,
+        starting_propt: data.starting_propt, // Keep the typo to match database schema
         start_options: data.start_options.filter(
           (opt) => opt && opt.trim() !== ""
         ),
         ending_scenes: data.ending_scenes.filter(
           (scene) => scene && scene.trim() !== ""
         ),
-        avatar_url: avatarBase64 as string | null, // Cast to string or null
-        email: session.user.email,
+        avatar_url: finalAvatarUrl,
+        email: session.user.email, 
       };
+
+      console.log("📤 Final character data for Supabase:", characterToInsert);
 
       const { error: insertError } = await createCharacter(characterToInsert);
 
       if (insertError) {
-        // Throw the error to be caught by the catch block
         throw new Error(insertError.message);
       }
 
-      toast.success("Character created and saved successfully!");
-      router.push("/dashboard"); // Redirect on success
+      alert("Character created and saved successfully!");
+      router.push("/dashboard");
     } catch (error) {
       console.error("Submission Error:", error);
       toast.error(
@@ -344,7 +360,7 @@ const CharacterForm = () => {
         }`
       );
     } finally {
-      setIsSubmitting(false); // Ensure loading state is turned off
+      setIsSubmitting(false);
     }
   };
 
