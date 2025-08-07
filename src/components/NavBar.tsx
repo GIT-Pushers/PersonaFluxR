@@ -9,9 +9,11 @@ import {
 } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Menu, X, ChevronDown, User as UserIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { createClient } from "@/utils/supabase/client";
+import type { User } from "@supabase/supabase-js";
 
 const Navbar = ({
   navItems,
@@ -26,10 +28,32 @@ const Navbar = ({
 }) => {
   const { scrollYProgress } = useScroll();
   const pathname = usePathname();
+  const supabase = createClient();
 
   const [isOpen, setIsOpen] = useState(false);
   const [activeSubmenu, setActiveSubmenu] = useState<number | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+
+  // Get user session and set up a listener for auth changes
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data } = await supabase.auth.getUser();
+      setUser(data.user);
+    };
+
+    checkUser();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setUser(session?.user ?? null);
+      }
+    );
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, [supabase.auth]);
 
   // Simplified scroll event listener to only track if the page is scrolled
   useMotionValueEvent(scrollYProgress, "change", (current) => {
@@ -153,8 +177,23 @@ const Navbar = ({
           </div>
 
           <div className="hidden lg:flex items-center space-x-2">
-            <Button variant="ghost">Log In</Button>
-            <Button className="rounded-lg">Get Started</Button>
+            {user ? (
+              <Link href="/profile">
+                <Button>
+                  <UserIcon className="mr-2 h-4 w-4" />
+                  Profile
+                </Button>
+              </Link>
+            ) : (
+              <>
+                <Link href="/login">
+                  <Button variant="ghost">Log In</Button>
+                </Link>
+                <Link href="/dashboard">
+                  <Button className="rounded-lg">Get Started</Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -214,12 +253,27 @@ const Navbar = ({
                 variants={menuItemVariants}
                 className="pt-8 flex flex-col items-center space-y-4"
               >
-                <Button variant="ghost" size="lg">
-                  Log In
-                </Button>
-                <Button size="lg" className="w-48 rounded-lg">
-                  Get Started
-                </Button>
+                {user ? (
+                  <Link href="/profile" onClick={() => setIsOpen(false)}>
+                    <Button size="lg" className="w-48 rounded-lg">
+                      <UserIcon className="mr-2 h-5 w-5" />
+                      Profile
+                    </Button>
+                  </Link>
+                ) : (
+                  <>
+                    <Link href="/login" onClick={() => setIsOpen(false)}>
+                      <Button variant="ghost" size="lg">
+                        Log In
+                      </Button>
+                    </Link>
+                    <Link href="/dashboard" onClick={() => setIsOpen(false)}>
+                      <Button size="lg" className="w-48 rounded-lg">
+                        Get Started
+                      </Button>
+                    </Link>
+                  </>
+                )}
               </motion.div>
             </div>
           </motion.div>
