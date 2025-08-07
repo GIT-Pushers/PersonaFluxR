@@ -1,4 +1,4 @@
-const NPCBubble = ({ message }) => {
+const NPCBubble = ({ message }: { message: string }) => {
   return (
     <div className="relative  bg-gray-200 text-black border-4 border-black px-4 py-2 w-fit max-w-sm font-mono text-base shadow-lg">
       {message}

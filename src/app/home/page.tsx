@@ -11,7 +11,6 @@ import NPCBubble from "@/components/NpcBubble";
 const Home = () => {
   const [currentImage, setCurrentImage] = useState(2);
   const [characterIndex, setCharacterIndex] = useState(3);
-  console.log("Character Index:", characterIndex);
 
   const {
     showMore,
@@ -66,12 +65,13 @@ const Home = () => {
         >
           <NPCBubble message="Hello! How can I assist you today?" />
           <div
-            className={`scale-[2.5] w-[128px] h-[128px] bg-[url('/male/male${characterIndex}/idle.png')] bg-no-repeat ${
+            className={`scale-[2.5] w-[128px] h-[128px] bg-no-repeat ${
               isDraggable ? "cursor-grab" : "cursor-default"
             }`}
             style={{
               animation: "idle 1s steps(6) infinite",
               backgroundSize: "auto",
+              backgroundImage: `url('/male/male${characterIndex}/idle.png')`,
             }}
           >
             <style jsx>{`
