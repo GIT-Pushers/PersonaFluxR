@@ -6,7 +6,7 @@ export default function Home() {
   const router = useRouter();
   return (
     <div className="flex justify-center items-center h-screen">
-      <Button onClick={() => router.push("/home")}>Go to Home</Button>
+      <Button onClick={() => router.push("/dashboard")}>Go to Dashboard</Button>
       <Logout />
     </div>
   );
