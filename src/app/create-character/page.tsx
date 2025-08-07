@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from "react";
 import { useForm, UseFormReturn } from "react-hook-form";
+import { useRouter } from "next/navigation"; // Import the router
 import {
   Check,
   ChevronsUpDown,
@@ -48,6 +49,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { createClient } from "@/utils/supabase/client";
+import { createCharacter } from "@/service/service";
 
 // --- DATA & TYPES ---
 
@@ -86,6 +89,7 @@ interface CharacterFormData {
 
 // --- REUSABLE & SUB-COMPONENTS ---
 
+// MultiSelect and FormSidebar components remain unchanged...
 const MultiSelect = React.forwardRef<
   HTMLButtonElement,
   {
@@ -208,6 +212,7 @@ const FormSidebar = ({ currentStep }: { currentStep: number }) => (
   </div>
 );
 
+// StepOneForm component remains unchanged...
 const StepOneForm = ({
   form,
   nextStep,
@@ -375,6 +380,7 @@ const StepOneForm = ({
   </div>
 );
 
+// StepTwoForm now accepts an 'isSubmitting' prop
 const StepTwoForm = ({
   form,
   prevStep,
@@ -382,6 +388,7 @@ const StepTwoForm = ({
   setImagePreview,
   onGenerate,
   isGenerating,
+  isSubmitting, // New prop for submission loading state
 }: {
   form: UseFormReturn<CharacterFormData>;
   prevStep: () => void;
@@ -389,8 +396,8 @@ const StepTwoForm = ({
   setImagePreview: React.Dispatch<React.SetStateAction<string | null>>;
   onGenerate: () => void;
   isGenerating: boolean;
+  isSubmitting: boolean; // New prop type
 }) => {
-  // FIX: Create a ref for the file input to programmatically clear it
   const avatarFileRef = useRef<HTMLInputElement>(null);
   const avatarRegister = form.register("avatar");
 
@@ -405,7 +412,7 @@ const StepTwoForm = ({
             type="button"
             size="sm"
             onClick={onGenerate}
-            disabled={isGenerating}
+            disabled={isGenerating || isSubmitting}
           >
             {isGenerating ? (
               <>
@@ -418,8 +425,7 @@ const StepTwoForm = ({
         </AlertDescription>
       </Alert>
 
-      <fieldset disabled={isGenerating} className="space-y-6">
-        {/* FIX: Replaced FormField with form.register for the file input */}
+      <fieldset disabled={isGenerating || isSubmitting} className="space-y-6">
         <FormItem>
           <FormLabel>Character Image (Avatar)</FormLabel>
           <FormControl>
@@ -429,12 +435,10 @@ const StepTwoForm = ({
               className="file:text-foreground"
               {...avatarRegister}
               ref={(e) => {
-                // Combine RHF's ref with our own
                 avatarRegister.ref(e);
                 avatarFileRef.current = e;
               }}
               onChange={(e) => {
-                // Call RHF's onChange then update our preview
                 avatarRegister.onChange(e);
                 if (e.target.files?.[0]) {
                   setImagePreview(URL.createObjectURL(e.target.files[0]));
@@ -461,7 +465,6 @@ const StepTwoForm = ({
               size="icon"
               className="absolute top-1 right-1 h-7 w-7 rounded-full z-10"
               onClick={() => {
-                // FIX: Use resetField and manually clear the input's value
                 form.resetField("avatar");
                 if (avatarFileRef.current) {
                   avatarFileRef.current.value = "";
@@ -643,11 +646,22 @@ const StepTwoForm = ({
       </fieldset>
 
       <div className="flex justify-between items-center pt-4">
-        <Button type="button" variant="outline" onClick={prevStep}>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={prevStep}
+          disabled={isSubmitting}
+        >
           Back
         </Button>
-        <Button type="submit" size="lg">
-          Create Character
+        <Button type="submit" size="lg" disabled={isGenerating || isSubmitting}>
+          {isSubmitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Creating...
+            </>
+          ) : (
+            "Create Character"
+          )}
         </Button>
       </div>
     </div>
@@ -666,10 +680,22 @@ const stepOneFields: (keyof CharacterFormData)[] = [
   "language",
 ];
 
+// Helper function to convert a file to a Base64 string
+const toBase64 = (file: File): Promise<string | ArrayBuffer | null> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (error) => reject(error);
+  });
+
 const CharacterForm = () => {
   const [step, setStep] = useState(1);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false); // New state for submission
+  const supabase = createClient();
+  const router = useRouter(); // Initialize router
 
   const form = useForm<CharacterFormData>({
     mode: "onBlur",
@@ -747,29 +773,65 @@ const CharacterForm = () => {
     }
   };
 
-  const onSubmit = (data: CharacterFormData) => {
-    const avatarFile = data.avatar?.[0] || null;
-    const nonEmptyStartOptions = data.start_options.filter(
-      (opt) => opt && opt.trim() !== ""
-    );
-    const nonEmptyEndingScenes = data.ending_scenes.filter(
-      (scene) => scene && scene.trim() !== ""
-    );
+  const onSubmit = async (data: CharacterFormData) => {
+    setIsSubmitting(true);
+    try {
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
 
-    const finalData = {
-      ...data,
-      start_options: nonEmptyStartOptions,
-      ending_scenes: nonEmptyEndingScenes,
-      avatar: avatarFile,
-      avatar_url: avatarFile ? `path/to/uploaded/${avatarFile.name}` : null,
-      age: data.age ? Number(data.age) : undefined,
-      no_of_scenes: Number(data.no_of_scenes),
-    };
+      if (sessionError || !session) {
+        throw new Error("Could not authenticate user. Please log in again.");
+      }
 
-    console.log("✅ Character Details Submitted:", finalData);
-    alert(
-      "Character created! Check the browser console for the final data object."
-    );
+      // Convert image to Base64 if it exists
+      let avatarBase64 = null;
+      const avatarFile = data.avatar?.[0];
+      if (avatarFile) {
+        avatarBase64 = await toBase64(avatarFile);
+      }
+
+      const characterToInsert = {
+        character_name: data.character_name,
+        traits: data.traits,
+        age: data.age ? Number(data.age) : undefined,
+        gender: data.gender,
+        voice_name: data.voice_name,
+        no_of_scenes: Number(data.no_of_scenes),
+        language: data.language,
+        backstory: data.backstory,
+        story_context: data.story_context,
+        starting_propt: data.starting_propt,
+        start_options: data.start_options.filter(
+          (opt) => opt && opt.trim() !== ""
+        ),
+        ending_scenes: data.ending_scenes.filter(
+          (scene) => scene && scene.trim() !== ""
+        ),
+        avatar_url: avatarBase64 as string | null, // Cast to string or null
+        email: session.user.email,
+      };
+
+      const { error: insertError } = await createCharacter(characterToInsert);
+
+      if (insertError) {
+        // Throw the error to be caught by the catch block
+        throw new Error(insertError.message);
+      }
+
+      alert("Character created and saved successfully!");
+      router.push("/dashboard"); // Redirect on success
+    } catch (error) {
+      console.error("Submission Error:", error);
+      alert(
+        `Failed to create character: ${
+          error instanceof Error ? error.message : "An unknown error occurred."
+        }`
+      );
+    } finally {
+      setIsSubmitting(false); // Ensure loading state is turned off
+    }
   };
 
   const nextStep = async () => {
@@ -801,6 +863,7 @@ const CharacterForm = () => {
                   setImagePreview={setImagePreview}
                   onGenerate={handleGenerateStory}
                   isGenerating={isGenerating}
+                  isSubmitting={isSubmitting} // Pass down the new state
                 />
               )}
             </form>
