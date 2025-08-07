@@ -1,4 +1,5 @@
 "use client";
+import Logout from "@/components/Signout";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 export default function Home() {
@@ -6,6 +7,7 @@ export default function Home() {
   return (
     <div className="flex justify-center items-center h-screen">
       <Button onClick={() => router.push("/home")}>Go to Home</Button>
+      <Logout />
     </div>
   );
 }

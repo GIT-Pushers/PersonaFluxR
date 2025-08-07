@@ -88,7 +88,7 @@ const Home = () => {
               Create Character
             </h2>
             <p className="text-sm text-gray-500 mt-1">
-              Define your character's core attributes and personality
+              Define your character&apos;s core attributes and personality
             </p>
           </div>
 
