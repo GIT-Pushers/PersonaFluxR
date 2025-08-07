@@ -339,7 +339,7 @@ const CharacterForm = () => {
           (scene) => scene && scene.trim() !== ""
         ),
         avatar_url: finalAvatarUrl,
-        email: session.user.email, 
+        email: session.user.email,
       };
 
       console.log("📤 Final character data for Supabase:", characterToInsert);
@@ -350,7 +350,7 @@ const CharacterForm = () => {
         throw new Error(insertError.message);
       }
 
-      alert("Character created and saved successfully!");
+      toast.success("Character created and saved successfully!");
       router.push("/dashboard");
     } catch (error) {
       console.error("Submission Error:", error);
