@@ -372,7 +372,7 @@ const CharacterForm = () => {
   const prevStep = () => setStep(1);
 
   return (
-    <div className="grid md:grid-cols-12 min-h-screen w-screen bg-background">
+    <div className="grid md:grid-cols-12 min-h-screen w-screen bg-background mt-15">
       <div className="hidden h-full md:block md:col-span-5 lg:col-span-4">
         <FormSidebar currentStep={step} />
       </div>
