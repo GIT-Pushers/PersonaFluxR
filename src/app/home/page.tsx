@@ -19,8 +19,6 @@ const Home = () => {
     setName,
     age,
     setAge,
-    traits,
-    setTraits,
     backstory,
     setBackstory,
   } = useChar();
@@ -84,13 +82,13 @@ const Home = () => {
       </section>
 
       <section className="bg-gray-50 w-45/100 flex items-center justify-center p-8">
-        <form className="w-full max-w-lg bg-white rounded-xl shadow-sm border border-gray-200 p-8 space-y-6">
+        <form className="w-full max-w-lg bg-white rounded-xl shadow-md border border-gray-200 p-8 space-y-6">
           <div className="text-center mb-6">
-            <h2 className="text-2xl font-semibold text-gray-900">
+            <h2 className="text-3xl font-bold text-gray-900">
               Create Character
             </h2>
             <p className="text-sm text-gray-500 mt-1">
-              Define your characters details
+              Define your character's core attributes and personality
             </p>
           </div>
 
@@ -100,12 +98,7 @@ const Home = () => {
                 key="mainFields"
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
-                exit={{
-                  opacity: 0,
-                  height: 0,
-                  marginTop: 0,
-                  marginBottom: 0,
-                }}
+                exit={{ opacity: 0, height: 0, marginTop: 0, marginBottom: 0 }}
                 transition={{ duration: 0.3, ease: "easeInOut" }}
                 className="space-y-5 overflow-hidden"
               >
@@ -122,7 +115,7 @@ const Home = () => {
                     name="name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
                     placeholder="Enter character name"
                     required
                   />
@@ -141,14 +134,14 @@ const Home = () => {
                     name="age"
                     value={age}
                     onChange={(e) => setAge(Number(e.target.value))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
                     placeholder="Enter age"
                     min={0}
                     required
                   />
                 </div>
 
-                <TraitsMultiSelect value={traits} onChange={setTraits} />
+                <TraitsMultiSelect />
 
                 <div className="space-y-2">
                   <label
@@ -162,7 +155,7 @@ const Home = () => {
                     name="backstory"
                     value={backstory}
                     onChange={(e) => setBackstory(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors resize-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors resize-none"
                     placeholder="Describe the character's backstory"
                     rows={4}
                     required
@@ -172,44 +165,67 @@ const Home = () => {
             )}
           </AnimatePresence>
 
-          <div>
+          {/* More Button */}
+          <div className="flex justify-between items-center">
             <button
               type="button"
               onClick={toggleShowMore}
-              className="text-sm text-blue-600 hover:underline"
+              className="text-sm text-blue-600 hover:text-blue-800 hover:underline inline-flex items-center space-x-1 transition-all"
             >
-              {showMore ? "Show Less" : "Show More"}
-            </button>
-            <AnimatePresence>
-              {showMore && (
-                <motion.div
-                  key="advancedOptions"
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
-                  className="mt-4 space-y-2 overflow-hidden"
+              <span>{showMore ? "Show Less" : "Show More"}</span>
+              <motion.span
+                animate={{ rotate: showMore ? 180 : 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
                 >
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      id="draggable"
-                      checked={isDraggable}
-                      onChange={(e) => setIsDraggable(e.target.checked)}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                    />
-                    <label
-                      htmlFor="draggable"
-                      className="text-sm font-medium text-gray-700"
-                    >
-                      Enable Draggable Character
-                    </label>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </motion.span>
+            </button>
           </div>
 
+          {/* Show More: Advanced Options */}
+          <AnimatePresence>
+            {showMore && (
+              <motion.div
+                key="advancedOptions"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                className="pt-4 space-y-2 border-t border-gray-200"
+              >
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="draggable"
+                    checked={isDraggable}
+                    onChange={(e) => setIsDraggable(e.target.checked)}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                  <label
+                    htmlFor="draggable"
+                    className="text-sm font-medium text-gray-700"
+                  >
+                    Enable Draggable Character
+                  </label>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Submit */}
           <AnimatePresence>
             {!showMore && (
               <motion.button
@@ -218,7 +234,7 @@ const Home = () => {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.3 }}
                 type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               >
                 Create Character
               </motion.button>

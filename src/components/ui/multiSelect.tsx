@@ -14,17 +14,13 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { X } from "lucide-react";
+import { useChar } from "@/store/useChar";
 
 const TRAITS = ["Brave", "Curious", "Loyal", "Smart", "Kind", "Funny", "Wise"];
 
-export function TraitsMultiSelect({
-  value,
-  onChange,
-}: {
-  value?: string[];
-  onChange?: (value: string[]) => void;
-}) {
-  const [selectedTraits, setSelectedTraits] = useState<string[]>(value || []);
+export function TraitsMultiSelect() {
+  const { traits, setTraits } = useChar();
+  const [selectedTraits, setSelectedTraits] = useState<string[]>(traits || []);
   const [open, setOpen] = useState(false);
 
   const toggleTrait = (trait: string) => {
@@ -33,7 +29,7 @@ export function TraitsMultiSelect({
     } else {
       setSelectedTraits([...selectedTraits, trait]);
     }
-    onChange?.(selectedTraits);
+    setTraits?.(selectedTraits);
   };
 
   return (

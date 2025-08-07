@@ -25,7 +25,6 @@ export const useChar = create<CharacterData>((set) => ({
   backstory: "",
   showMore: false,
   isDraggable: false,
-
   setName: (name) => set({ name }),
   setAge: (age) => set({ age }),
   setTraits: (traits) => set({ traits }),
