@@ -93,3 +93,30 @@ export async function getCharacterById(id: number) {
   console.log(`Successfully fetched character ${id}:`, data);
   return { data, error: null };
 }
+export async function deleteCharacterById(id: number) {
+  // Ensure an ID is a valid number before querying.
+  if (typeof id !== "number" || isNaN(id)) {
+    return {
+      data: null,
+      error: new Error("A valid character ID number is required."),
+    };
+  }
+
+  const supabase = createClient();
+
+  // Use .delete() to remove the record.
+  // Use .eq('id', id) to specify which character to delete.
+  const { data, error } = await supabase
+    .from("characters")
+    .delete()
+    .eq("id", id);
+
+  // Handle any potential errors during the delete operation.
+  if (error) {
+    console.error("Supabase delete error:", error.message);
+    return { data: null, error };
+  }
+
+  console.log(`Successfully deleted character ${id}.`);
+  return { data, error: null };
+}
